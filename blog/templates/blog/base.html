@@ -1,0 +1,167 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'blog/main.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="site-header">
+      <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
+        <div class="container">
+    <a class="navbar-brand" href="/">
+    <span class="logo-icon">🔬</span> Research Hub
+</a>
+          <buttwon class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+          </buttwon>
+          <div class="collapse navbar-collapse" id="navbarToggle">
+            <div class="navbar-nav mr-auto">
+                {% if user.is_authenticated %}
+              <a class="nav-item nav-link" href="{% url 'blog-home' %}">HOME</a>
+              <a class="nav-item nav-link" href="{% url 'blog-about' %}">ABOUT</a>
+            </div>
+            <!-- Navbar Right Side -->
+            <div class="navbar-nav">
+              <!-- <a class="nav-item nav-link" href="#">Login</a>
+              <a class="nav-item nav-link" href="#">Register</a> -->
+              <!-- <button class="noselect">Create Post</button> -->
+<!--                <h3 style="color: white;">Hello {{request.user}}</h3>-->
+                <a href="{% url 'blog-new' %}" id="auth-links">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                Create Post
+            </a>
+                <a href="{% url 'profile' %}" id="auth-links">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                Profile
+            </a>
+                <a href="{% url 'logout' %}" id="auth-links">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                Logout
+            </a>
+                {% else %}
+              <a href="{% url 'login' %}" id="auth-links">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                Login
+            </a>
+            <a href="{% url 'register' %}" id="auth-links">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                Register
+            </a>
+            <!-- <a href="#">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                Neon button
+            </a> -->
+                {% endif %}
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <main role="main" class="container">
+      <div class="row">
+          <div class="col-md-8">
+              {%  if messages%}
+                {% for message in messages %}
+                    <div class="alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+              {% endif %}
+          </div>
+        <div class="col-md-8">
+           {% block content %}{% endblock %}
+        </div>
+        <div class="col-md-4">
+          <div class="content-sectionw">
+            <!-- <h3>Our Sidebar</h3>
+            <p class='text-muted'>You can put any information here you'd like.
+              <ul class="list-group">
+                <li class="list-group-item list-group-item-light">Latest Posts</li>
+                <li class="list-group-item list-group-item-light">Announcements</li>
+                <li class="list-group-item list-group-item-light">Calendars</li>
+                <li class="list-group-item list-group-item-light">etc</li>
+              </ul>
+            </p> -->
+            <div class="d-flex flex-column align-items-stretch flex-shrink-0 bg-white" style="width: 380px;" style="padding-top: 120px;">
+                <a id="list-group" style="text-decoration: none;" href="" class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom">
+                  <!-- <svg class="bi me-2" width="30" height="24"><use xlink:href="#bootstrap"/></svg> -->
+                  <span class="fs-5 fw-semibold" id="gist-btn">Latest Gist</span>
+                </a>
+                <div class="list-group list-group-flush border-bottom scrollarea">
+                  <a href="#" class="list-group-item list-group-item-action  lh-tight" aria-current="true">
+                    <div class="d-flex w-100 align-items-center justify-content-between">
+                      <strong class="mb-1">Seriously, Stop Trying to Teach Toddlers How to Code...By Desphixs
+                    </strong>
+                      <small>Wed</small>
+                    </div>
+                    <div class="col-10 mb-1 small">AS A BABY nerd, I was obsessed with Hackers. The 1995 cult movie... </div>
+                  </a>
+                  <a href="#" class="list-group-item list-group-item-action py-3 lh-tight">
+                    <div class="d-flex w-100 align-items-center justify-content-between">
+                      <strong class="mb-1">Its not a bug - It's a feature... by Desphixs</strong>
+                      <small class="text-muted">Tues</small>
+                    </div>
+                    <div class="col-10 mb-1 small">When it comes to coding, everything works like a miracle, let me use that word...hahaha</div>
+                  </a>
+                  <a href="#" class="list-group-item list-group-item-action py-3 lh-tight">
+                    <div class="d-flex w-100 align-items-center justify-content-between">
+                      <strong class="mb-1">I wanted to be a great programmer but...by Desphixs</strong>
+                      <small class="text-muted">Mon</small>
+                    </div>
+                    <div class="col-10 mb-1 small">in my family trait, nobody knows anything about computers and i wanted to be the greatest computer scientist ever and...</div>
+                  </a>
+
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+
+
+
+        <footer class="" >
+          <ul class="nav justify-content-center border-bottom"  style="margin-top: 60px;">
+            <li class="nav-item"><a href="#" class="nav-link px-2 text-muted">Home</a></li>
+            <li class="nav-item"><a href="#" class="nav-link px-2 text-muted">Features</a></li>
+            <li class="nav-item"><a href="admin/" class="nav-link px-2 text-muted">Admin</a></li>
+            <li class="nav-item"><a href="#" class="nav-link px-2 text-muted">FAQs</a></li>
+            <li class="nav-item"><a href="#" class="nav-link px-2 text-muted">About</a></li>
+          </ul>
+          <p class="text-center text-muted">&copy; Dr Misheck Shawa 2026</p>
+        </footer>
+
+    </main>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>
