@@ -1,0 +1,13 @@
+{% extends 'blog/base.html' %}
+{% block content %}
+<h2><i class="fas fa-exclamation-triangle"></i> Critical Alerts</h2>
+{% for alert in alerts %}
+    <div class="alert-card" style="border-left: 5px solid #dc3545; padding: 15px; margin-bottom: 15px; background: white; border-radius: 8px;">
+        <h3><a href="{{ alert.get_absolute_url }}">{{ alert.title }}</a></h3>
+        <p>{{ alert.summary|truncatechars:200 }}</p>
+        <small>📍 {{ alert.location }}</small>
+    </div>
+{% empty %}
+    <p>No critical alerts at this time.</p>
+{% endfor %}
+{% endblock %}

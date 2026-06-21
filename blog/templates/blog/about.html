@@ -1,6 +1,222 @@
 {% extends 'blog/base.html' %}
+{% load static %}
+
 {% block content %}
-    <div class="container" style="background: white; padding: 20px; margin-top: 10px; border-radius: 20px;">
-        <h1>Research Hub</h1>
+<div class="about-container">
+    
+    <!-- About Header -->
+    <div class="about-header">
+        <h1><i class="fas fa-microscope"></i> About ZedAMR Research Hub</h1>
+        <p class="about-subtitle">Antimicrobial Resistance Intelligence for Zambia</p>
     </div>
+
+    <!-- Mission Section -->
+    <div class="about-section mission-section">
+        <div class="about-icon">
+            <i class="fas fa-bullseye"></i>
+        </div>
+        <div class="about-content">
+            <h2>Our Mission</h2>
+            <p>To provide timely, accurate, and actionable antimicrobial resistance (AMR) intelligence to healthcare professionals, policymakers, and researchers in Zambia. We aim to combat the growing threat of drug-resistant infections through evidence-based research and data-driven decision making.</p>
+        </div>
+    </div>
+
+    <!-- What We Do -->
+    <div class="about-section">
+        <h2><i class="fas fa-tasks"></i> What We Do</h2>
+        <div class="about-grid">
+            <div class="about-card">
+                <i class="fas fa-file-alt fa-2x"></i>
+                <h4>Research Summaries</h4>
+                <p>Concise, digestible summaries of latest AMR research papers and findings relevant to Zambia.</p>
+            </div>
+            <div class="about-card">
+                <i class="fas fa-exclamation-triangle fa-2x"></i>
+                <h4>Critical Alerts</h4>
+                <p>Real-time alerts on emerging resistance patterns, outbreaks, and treatment failures.</p>
+            </div>
+            <div class="about-card">
+                <i class="fas fa-chart-line fa-2x"></i>
+                <h4>Data & Statistics</h4>
+                <p>Up-to-date statistics on resistance rates, costs, and trends across Zambian regions.</p>
+            </div>
+            <div class="about-card">
+                <i class="fas fa-user-md fa-2x"></i>
+                <h4>Expert Network</h4>
+                <p>Connect with leading AMR specialists and researchers in Zambia and beyond.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Focus Areas -->
+    <div class="about-section">
+        <h2><i class="fas fa-folder-open"></i> Key Focus Areas</h2>
+        <div class="focus-grid">
+            <div class="focus-item health-focus">
+                <i class="fas fa-hospital"></i>
+                <h4>Health</h4>
+                <ul>
+                    <li>ICU resistance tracking</li>
+                    <li>Hospital infection control</li>
+                    <li>Antibiotic stewardship</li>
+                </ul>
+            </div>
+            <div class="focus-item agri-focus">
+                <i class="fas fa-tractor"></i>
+                <h4>Agriculture</h4>
+                <ul>
+                    <li>Antibiotic use in livestock</li>
+                    <li>Foodborne resistance</li>
+                    <li>One Health approach</li>
+                </ul>
+            </div>
+            <div class="focus-item env-focus">
+                <i class="fas fa-globe-africa"></i>
+                <h4>Environment</h4>
+                <ul>
+                    <li>Water contamination</li>
+                    <li>Waste management</li>
+                    <li>Environmental surveillance</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Geographic Coverage -->
+    <div class="about-section">
+        <h2><i class="fas fa-map-marked-alt"></i> Geographic Coverage</h2>
+        <div class="location-grid">
+            <div class="location-item">
+                <i class="fas fa-city"></i>
+                <h5>Lusaka</h5>
+                <p>Urban resistance patterns, ICU data</p>
+            </div>
+            <div class="location-item">
+                <i class="fas fa-city"></i>
+                <h5>Ndola</h5>
+                <p>Copperbelt region, infection control</p>
+            </div>
+            <div class="location-item">
+                <i class="fas fa-city"></i>
+                <h5>Livingstone</h5>
+                <p>Tourism-related health monitoring</p>
+            </div>
+            <div class="location-item">
+                <i class="fas fa-flag"></i>
+                <h5>Nationwide</h5>
+                <p>National AMR surveillance</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Our Team -->
+    <div class="about-section">
+        <h2><i class="fas fa-users"></i> Our Team</h2>
+        <div class="team-grid">
+            <div class="team-member">
+                <div class="team-avatar">
+                    <i class="fas fa-user-circle fa-4x"></i>
+                </div>
+                <h4>Dr. Misheck Shawa</h4>
+                <p class="team-title">Founder & Lead Researcher</p>
+                <p class="team-bio">AMR specialist with over 10 years of experience in Zambian healthcare systems.</p>
+            </div>
+            <div class="team-member">
+                <div class="team-avatar">
+                    <i class="fas fa-user-circle fa-4x"></i>
+                </div>
+                <h4>Research Team</h4>
+                <p class="team-title">Data Scientists & Analysts</p>
+                <p class="team-bio">Dedicated professionals analyzing AMR data and publishing insights.</p>
+            </div>
+            <div class="team-member">
+                <div class="team-avatar">
+                    <i class="fas fa-user-circle fa-4x"></i>
+                </div>
+                <h4>Expert Network</h4>
+                <p class="team-title">Advisory Board</p>
+                <p class="team-bio">Leading clinicians, veterinarians, and environmental scientists.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics / Impact -->
+    <div class="about-section impact-section">
+        <h2><i class="fas fa-chart-bar"></i> Our Impact</h2>
+        <div class="impact-grid">
+            <div class="impact-stat">
+                <span class="impact-number">34%</span>
+                <span class="impact-label">ICU Resistance Rate</span>
+            </div>
+            <div class="impact-stat">
+                <span class="impact-number">$47M</span>
+                <span class="impact-label">Estimated Annual Cost</span>
+            </div>
+            <div class="impact-stat">
+                <span class="impact-number">60%</span>
+                <span class="impact-label">E. coli Resistance</span>
+            </div>
+            <div class="impact-stat">
+                <span class="impact-number">50%</span>
+                <span class="impact-label">ICU Infections Reduced</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call to Action -->
+    <div class="about-section cta-section">
+        <h2><i class="fas fa-handshake"></i> Get Involved</h2>
+        <p>Join us in the fight against antimicrobial resistance in Zambia.</p>
+        <div class="cta-buttons">
+            <a href="{% url 'blog-home' %}" class="btn btn-primary">
+                <i class="fas fa-newspaper"></i> Read Research
+            </a>
+            <a href="{% url 'expert-list' %}" class="btn btn-success">
+                <i class="fas fa-user-md"></i> Connect with Experts
+            </a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'blog-create' %}" class="btn btn-info">
+                <i class="fas fa-plus"></i> Contribute Research
+            </a>
+            {% else %}
+            <a href="{% url 'register' %}" class="btn btn-info">
+                <i class="fas fa-user-plus"></i> Join Us
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Partners -->
+    <div class="about-section partners-section">
+        <h2><i class="fas fa-handshake"></i> Our Partners</h2>
+        <div class="partner-grid">
+            <div class="partner-item">
+                <i class="fas fa-hospital fa-3x"></i>
+                <span>Ministry of Health</span>
+            </div>
+            <div class="partner-item">
+                <i class="fas fa-university fa-3x"></i>
+                <span>University of Zambia</span>
+            </div>
+            <div class="partner-item">
+                <i class="fas fa-globe fa-3x"></i>
+                <span>WHO Zambia</span>
+            </div>
+            <div class="partner-item">
+                <i class="fas fa-flask fa-3x"></i>
+                <span>CDC Zambia</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Note -->
+    <div class="about-footer">
+        <p><i class="fas fa-copyright"></i> 2026 ZedAMR Research Hub | Created by Dr. Misheck Shawa</p>
+        <p class="text-muted small">
+            <i class="fas fa-envelope"></i> contact@zedamr.org | 
+            <i class="fas fa-phone"></i> +260 XXX XXX XXX
+        </p>
+    </div>
+
+</div>
 {% endblock content %}

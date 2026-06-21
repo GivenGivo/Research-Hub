@@ -1,23 +1,294 @@
 {% extends 'blog/base.html' %}
+{% load static %}
+
 {% block content %}
 
-        <article class="media content-section">
-            <img class="rounded-cirlce article-img" src="{{ object.author.profile.image.url }}" alt="">
-            <div class="media-body">
-              <div class="article-metadata">
-                <a class="mr-2" href="#">{{ object.author }}</a>
-                <small class="text-muted">{{ object.date_posted }}</small> <br>
-                  {% if object.author == user %}
+<!-- Critical Alert Banner -->
+{% if object.is_alert %}
+<div class="alert-banner critical-alert">
+    <div class="alert-icon">⚠️</div>
+    <div class="alert-content">
+        <h2>CRITICAL ALERT</h2>
+        <p>{{ object.title }}</p>
+        {% if object.threat_level %}
+        <span class="threat-level">
+            {{ object.threat_level.level }}
+        </span>
+        {% endif %}
+        <div class="alert-location">📍 {{ object.location|default:"Zambia" }}</div>
+    </div>
+</div>
+{% endif %}
 
-                    <div>
-                        <a class="btn btn-outline-success" href="{% url 'blog-update' object.id %}">Update</a>
-                        <a class="btn btn-outline-danger" href="{% url 'blog-delete' object.id %}">Delete</a>
-                    </div>
-                  {% endif %}
-              </div>
-              <h2><a class="article-title" href="#">{{ object.title }}</a></h2>
-              <p class="article-content">{{ object.content }}</p>
+<!-- Main Article -->
+<article class="media content-section">
+    <div class="media-body">
+        
+        <!-- Author & Meta Info -->
+        <div class="article-metadata">
+            <div class="author-section">
+                <img class="rounded-circle article-img" src="{{ object.author.profile.image.url }}" alt="{{ object.author }}">
+                <div class="author-info">
+                    <a class="mr-2" href="#">{{ object.author }}</a>
+                    <small class="text-muted">{{ object.date_posted|date:"F d, Y" }}</small>
+                    {% if object.updated_at != object.date_posted %}
+                    <small class="text-muted">(Updated: {{ object.updated_at|date:"F d, Y" }})</small>
+                    {% endif %}
+                </div>
             </div>
-            <br>
-          </article>
+            
+            <!-- Action Buttons -->
+            {% if object.author == user %}
+            <div class="action-buttons">
+                <a class="btn btn-outline-success btn-sm" href="{% url 'blog-update' object.id %}">
+                    <i class="fas fa-edit"></i> Update
+                </a>
+                <a class="btn btn-outline-danger btn-sm" href="{% url 'blog-delete' object.id %}">
+                    <i class="fas fa-trash"></i> Delete
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sector & Location Badges -->
+        <div class="post-badges">
+            {% if object.sector %}
+            <span class="badge sector-badge">
+                <i class="fas fa-tag"></i> {{ object.sector.name }}
+            </span>
+            {% endif %}
+            
+            {% if object.location %}
+            <span class="badge location-badge">
+                <i class="fas fa-map-marker-alt"></i> {{ object.location }}
+            </span>
+            {% endif %}
+            
+            {% if object.threat_level %}
+            <span class="badge threat-badge">
+                <i class="fas fa-exclamation-triangle"></i> {{ object.threat_level.level }}
+            </span>
+            {% endif %}
+            
+            <span class="badge views-badge">
+                <i class="fas fa-eye"></i> {{ object.views_count }} views
+            </span>
+        </div>
+
+        <!-- Post Title -->
+        <h2 class="article-title">{{ object.title }}</h2>
+
+        <!-- Statistics Dashboard Cards -->
+        {% if object.statistic_value or object.cost_estimate %}
+        <div class="stats-dashboard">
+            {% if object.statistic_value %}
+            <div class="stat-card">
+                <div class="stat-value">{{ object.statistic_value }}</div>
+                {% if object.statistic_change %}
+                <div class="stat-change">{{ object.statistic_change }}</div>
+                {% endif %}
+                <div class="stat-label">{{ object.statistic_label|default:"Statistic" }}</div>
+            </div>
+            {% endif %}
+            
+            {% if object.cost_estimate %}
+            <div class="stat-card cost-card">
+                <div class="stat-value">{{ object.cost_estimate }}</div>
+                <div class="stat-label">{{ object.cost_description|default:"Estimated Cost" }}</div>
+            </div>
+            {% endif %}
+            
+            {% if object.views_count %}
+            <div class="stat-card impact-card">
+                <div class="stat-value">{{ object.views_count }}</div>
+                <div class="stat-label">Total Views</div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Summary Section -->
+        {% if object.summary %}
+        <div class="post-summary">
+            <h4><i class="fas fa-file-alt"></i> Summary</h4>
+            <p class="summary-text">{{ object.summary }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Main Content -->
+        <div class="post-content">
+            {{ object.content|safe }}
+        </div>
+
+        <!-- Action Items -->
+        {% if object.action_items %}
+        <div class="action-items">
+            <h3><i class="fas fa-tasks"></i> What We Need</h3>
+            <ul>
+                {% for item in object.action_items.splitlines %}
+                    {% if item.strip %}
+                    <li><i class="fas fa-check-circle"></i> {{ item }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <!-- Tags -->
+        {% if object.tags %}
+        <div class="post-tags">
+            <i class="fas fa-tags"></i>
+            {% for tag in object.tags.split|slice:":10" %}
+                <span class="tag">{{ tag }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Downloadable Resources -->
+        {% if object.infographic or object.pdf_file %}
+        <div class="resources-section">
+            <h3><i class="fas fa-download"></i> Resources</h3>
+            <div class="resource-grid">
+                {% if object.infographic %}
+                <div class="resource-card">
+                    <i class="fas fa-chart-pie fa-2x"></i>
+                    <span>Infographic</span>
+                    <a href="{{ object.infographic.url }}" download class="btn btn-primary btn-sm">
+                        <i class="fas fa-download"></i> Download
+                    </a>
+                </div>
+                {% endif %}
+                
+                {% if object.pdf_file %}
+                <div class="resource-card">
+                    <i class="fas fa-file-pdf fa-2x"></i>
+                    <span>Full Report</span>
+                    <a href="{{ object.pdf_file.url }}" download class="btn btn-danger btn-sm">
+                        <i class="fas fa-download"></i> Download PDF
+                    </a>
+                </div>
+                {% endif %}
+                
+                {% if object.featured_image %}
+                <div class="resource-card">
+                    <i class="fas fa-image fa-2x"></i>
+                    <span>Featured Image</span>
+                    <a href="{{ object.featured_image.url }}" target="_blank" class="btn btn-info btn-sm">
+                        <i class="fas fa-eye"></i> View
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- References -->
+        {% if object.references %}
+        <div class="references-section">
+            <h3><i class="fas fa-book"></i> References</h3>
+            <div class="reference-list">
+                {{ object.references|linebreaks }}
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</article>
+
+<!-- Related Posts -->
+{% if related_posts %}
+<div class="related-posts-section">
+    <h3><i class="fas fa-link"></i> Related Research</h3>
+    <div class="related-grid">
+        {% for related in related_posts %}
+        <div class="related-card">
+            <div class="related-header">
+                {% if related.sector %}
+                <span class="related-sector-badge">{{ related.sector.name }}</span>
+                {% endif %}
+                {% if related.is_alert %}
+                <span class="related-alert-badge">⚠️ Alert</span>
+                {% endif %}
+            </div>
+            <h4><a href="{{ related.get_absolute_url }}">{{ related.title|truncatechars:60 }}</a></h4>
+            <div class="related-meta">
+                <small>{{ related.date_posted|date:"M d, Y" }}</small>
+                {% if related.location %}
+                <small>📍 {{ related.location }}</small>
+                {% endif %}
+            </div>
+            <a href="{{ related.get_absolute_url }}" class="btn btn-outline-primary btn-sm read-more">
+                Read More <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Ask an Expert Section -->
+{% if experts %}
+<div class="expert-section">
+    <h3><i class="fas fa-user-md"></i> Ask an Expert</h3>
+    <p class="expert-intro">Have questions about this research? Reach out to our experts:</p>
+    <div class="expert-grid">
+        {% for expert in experts %}
+        <div class="expert-card">
+            <div class="expert-avatar">
+                {% if expert.photo %}
+                <img src="{{ expert.photo.url }}" alt="{{ expert.name }}" class="expert-photo">
+                {% else %}
+                <div class="expert-avatar-placeholder">
+                    <i class="fas fa-user-circle fa-3x"></i>
+                </div>
+                {% endif %}
+            </div>
+            <div class="expert-info">
+                <h4>{{ expert.name }}</h4>
+                <p class="expert-title">{{ expert.title }}</p>
+                <p class="expert-org"><i class="fas fa-building"></i> {{ expert.organization }}</p>
+                <p class="expert-expertise"><i class="fas fa-star"></i> {{ expert.expertise|truncatechars:60 }}</p>
+                <a href="{% url 'contact-expert' expert.id %}" class="btn btn-success btn-sm contact-expert">
+                    <i class="fas fa-envelope"></i> Contact
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Share Section -->
+<div class="share-section">
+    <h4><i class="fas fa-share-alt"></i> Share This Research</h4>
+    <div class="share-buttons">
+        <a href="https://twitter.com/intent/tweet?text={{ object.title|urlencode }}&url={{ request.build_absolute_uri }}" 
+           target="_blank" class="btn btn-twitter">
+            <i class="fab fa-twitter"></i> Twitter
+        </a>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri }}" 
+           target="_blank" class="btn btn-linkedin">
+            <i class="fab fa-linkedin"></i> LinkedIn
+        </a>
+        <a href="https://api.whatsapp.com/send?text={{ object.title|urlencode }} - {{ request.build_absolute_uri }}" 
+           target="_blank" class="btn btn-whatsapp">
+            <i class="fab fa-whatsapp"></i> WhatsApp
+        </a>
+        <button onclick="copyToClipboard('{{ request.build_absolute_uri }}')" class="btn btn-copy">
+            <i class="fas fa-copy"></i> Copy Link
+        </button>
+    </div>
+</div>
+
+<!-- JavaScript for Copy to Clipboard -->
+<script>
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+        alert('Link copied to clipboard!');
+    }, function(err) {
+        console.error('Could not copy text: ', err);
+    });
+}
+</script>
+
 {% endblock content %}

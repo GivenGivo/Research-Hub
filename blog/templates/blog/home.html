@@ -1,18 +1,319 @@
 {% extends 'blog/base.html' %}
+{% load static %}
+
 {% block content %}
 
-    {% for posts in posts %}
-        <article class="media content-section">
-            <img class="rounded-cirlce article-img" src="{{ posts.author.profile.image.url }}" alt="">
-            <div class="media-body">
-              <div class="article-metadata">
-                <a class="mr-2" href="#">{{ posts.author }}</a>
-                <small class="text-muted">{{ posts.date_posted }}</small>
-              </div>
-              <h2><a class="article-title" href="{% url 'blog-detail' posts.id %}">{{ posts.title }}</a></h2>
-              <p class="article-content">{{ posts.content }}</p>
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+    <div class="header-content">
+        <h1><i class="fas fa-microscope"></i> ZedAMR Research Hub</h1>
+        <p class="header-subtitle">Antimicrobial Resistance Intelligence for Zambia</p>
+    </div>
+    <div class="header-stats">
+        <div class="header-stat">
+            <span class="stat-number">{{ total_posts|default:posts.count }}</span>
+            <span class="stat-label">Total Posts</span>
+        </div>
+        <div class="header-stat">
+            <span class="stat-number">{{ total_alerts|default:0 }}</span>
+            <span class="stat-label">Critical Alerts</span>
+        </div>
+        <div class="header-stat">
+            <span class="stat-number">{{ sectors.count|default:0 }}</span>
+            <span class="stat-label">Sectors</span>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Filter Bar -->
+<div class="filter-bar">
+    <form method="GET" action="{% url 'blog-home' %}" class="filter-form">
+        <div class="filter-group">
+            <select name="sector" class="form-control filter-select">
+                <option value="">All Sectors</option>
+                {% for sector in sectors %}
+                <option value="{{ sector.slug }}" {% if current_sector == sector.slug %}selected{% endif %}>
+                    {{ sector.name }}
+                </option>
+                {% endfor %}
+            </select>
+            
+            <select name="threat" class="form-control filter-select">
+                <option value="">All Threat Levels</option>
+                {% for threat in threat_levels %}
+                <option value="{{ threat.level }}" {% if current_threat == threat.level %}selected{% endif %}>
+                    {{ threat.level }}
+                </option>
+                {% endfor %}
+            </select>
+            
+            <input type="text" name="q" class="form-control filter-search" 
+                   placeholder="Search research..." value="{{ search_query }}">
+            
+            <button type="submit" class="btn btn-primary filter-btn">
+                <i class="fas fa-filter"></i> Filter
+            </button>
+            
+            {% if search_query or current_sector or current_threat %}
+            <a href="{% url 'blog-home' %}" class="btn btn-secondary clear-btn">
+                <i class="fas fa-times"></i> Clear
+            </a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<!-- Critical Alerts Section -->
+{% if alerts %}
+<div class="alerts-section">
+    <h3><i class="fas fa-exclamation-triangle text-danger"></i> Critical Alerts</h3>
+    <div class="alerts-grid">
+        {% for alert in alerts %}
+        <div class="alert-card">
+            <div class="alert-card-header">
+                <span class="alert-badge">⚠️ CRITICAL</span>
+                {% if alert.sector %}
+                <span class="alert-sector">{{ alert.sector.name }}</span>
+                {% endif %}
+                {% if alert.threat_level %}
+                <span class="alert-threat">{{ alert.threat_level.level }}</span>
+                {% endif %}
             </div>
-            <br>
-          </article>
-    {% endfor  %}
+            <h4><a href="{{ alert.get_absolute_url }}">{{ alert.title|truncatechars:60 }}</a></h4>
+            {% if alert.location %}
+            <p class="alert-location"><i class="fas fa-map-marker-alt"></i> {{ alert.location }}</p>
+            {% endif %}
+            {% if alert.statistic_value %}
+            <div class="alert-stat">
+                <span class="alert-stat-value">{{ alert.statistic_value }}</span>
+                <span class="alert-stat-change">{{ alert.statistic_change }}</span>
+            </div>
+            {% endif %}
+            <a href="{{ alert.get_absolute_url }}" class="btn btn-danger btn-sm alert-read-btn">
+                Read Alert <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Featured Posts Section -->
+{% if featured %}
+<div class="featured-section">
+    <h3><i class="fas fa-star text-warning"></i> Featured Research</h3>
+    <div class="featured-grid">
+        {% for post in featured %}
+        <div class="featured-card">
+            {% if post.featured_image %}
+            <div class="featured-image">
+                <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="featured-img">
+            </div>
+            {% endif %}
+            <div class="featured-content">
+                <div class="featured-meta">
+                    {% if post.sector %}
+                    <span class="featured-sector">{{ post.sector.name }}</span>
+                    {% endif %}
+                    <span class="featured-date">{{ post.date_posted|date:"M d, Y" }}</span>
+                </div>
+                <h4><a href="{{ post.get_absolute_url }}">{{ post.title|truncatechars:70 }}</a></h4>
+                {% if post.summary %}
+                <p class="featured-summary">{{ post.summary|truncatechars:120 }}</p>
+                {% endif %}
+                <a href="{{ post.get_absolute_url }}" class="btn btn-outline-primary btn-sm">
+                    Read More <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Quick Stats Dashboard -->
+{% if latest_stats %}
+<div class="stats-dashboard-section">
+    <h3><i class="fas fa-chart-line"></i> Latest Statistics</h3>
+    <div class="stats-grid">
+        {% for stat in latest_stats %}
+        <div class="stat-card-dashboard">
+            <div class="stat-card-value">{{ stat.statistic_value }}</div>
+            {% if stat.statistic_change %}
+            <div class="stat-card-change">{{ stat.statistic_change }}</div>
+            {% endif %}
+            <div class="stat-card-label">{{ stat.statistic_label|default:"Metric" }}</div>
+            <div class="stat-card-title">{{ stat.title|truncatechars:40 }}</div>
+            <a href="{{ stat.get_absolute_url }}" class="stat-card-link">View Details <i class="fas fa-arrow-right"></i></a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Main Posts Grid -->
+<div class="posts-section">
+    <div class="posts-header">
+        <h3><i class="fas fa-newspaper"></i> All Research Posts</h3>
+        {% if user.is_authenticated %}
+        <a href="{% url 'blog-create' %}" class="btn btn-success create-btn">
+            <i class="fas fa-plus"></i> New Post
+        </a>
+        {% endif %}
+    </div>
+
+    {% if posts %}
+        {% for post in posts %}
+        <article class="media content-section post-item">
+            <div class="post-item-header">
+                <img class="rounded-circle article-img" src="{{ post.author.profile.image.url }}" alt="{{ post.author }}">
+                <div class="post-item-meta">
+                    <div class="post-author">
+                        <a class="mr-2" href="#">{{ post.author }}</a>
+                        {% if post.is_alert %}
+                        <span class="post-alert-badge">🔴 Alert</span>
+                        {% endif %}
+                        {% if post.is_featured %}
+                        <span class="post-featured-badge">⭐ Featured</span>
+                        {% endif %}
+                    </div>
+                    <div class="post-date">
+                        <small class="text-muted">{{ post.date_posted|date:"F d, Y" }}</small>
+                        {% if post.location %}
+                        <small class="text-muted post-location">📍 {{ post.location }}</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="post-item-body">
+                <div class="post-badges">
+                    {% if post.sector %}
+                    <span class="badge sector-badge">{{ post.sector.name }}</span>
+                    {% endif %}
+                    {% if post.threat_level %}
+                    <span class="badge threat-badge">{{ post.threat_level.level }}</span>
+                    {% endif %}
+                    {% if post.statistic_value %}
+                    <span class="badge stat-badge">{{ post.statistic_value }}</span>
+                    {% endif %}
+                </div>
+
+                <h2 class="article-title">
+                    <a href="{% url 'blog-detail' post.id %}">{{ post.title }}</a>
+                </h2>
+
+                {% if post.summary %}
+                <p class="article-summary">{{ post.summary|truncatechars:200 }}</p>
+                {% else %}
+                <p class="article-content">{{ post.content|truncatechars:200|safe }}</p>
+                {% endif %}
+
+                <div class="post-item-footer">
+                    <a href="{% url 'blog-detail' post.id %}" class="btn btn-outline-primary btn-sm read-more-btn">
+                        Read Full Article <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <div class="post-item-stats">
+                        <span><i class="fas fa-eye"></i> {{ post.views_count }}</span>
+                        {% if post.cost_estimate %}
+                        <span><i class="fas fa-dollar-sign"></i> {{ post.cost_estimate }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </article>
+        {% endfor %}
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <div class="pagination-section">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1{% if search_query %}&q={{ search_query }}{% endif %}{% if current_sector %}&sector={{ current_sector }}{% endif %}">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_sector %}&sector={{ current_sector }}{% endif %}">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_sector %}&sector={{ current_sector }}{% endif %}">
+                                {{ num }}
+                            </a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_sector %}&sector={{ current_sector }}{% endif %}">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_sector %}&sector={{ current_sector }}{% endif %}">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+
+    {% else %}
+        <!-- No Posts Found -->
+        <div class="no-posts">
+            <i class="fas fa-inbox fa-3x"></i>
+            <h4>No Research Posts Found</h4>
+            <p class="text-muted">Be the first to contribute to the AMR research hub!</p>
+            {% if user.is_authenticated %}
+            <a href="{% url 'blog-create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Create First Post
+            </a>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+
+<!-- Quick Links Section -->
+<div class="quick-links-section">
+    <div class="quick-links-grid">
+        <div class="quick-link-card">
+            <i class="fas fa-chart-pie"></i>
+            <h5>Infographics</h5>
+            <p>Visual data on AMR trends</p>
+            <a href="{% url 'blog-home' %}?q=infographic" class="btn btn-outline-primary btn-sm">Explore</a>
+        </div>
+        <div class="quick-link-card">
+            <i class="fas fa-file-pdf"></i>
+            <h5>Policy Documents</h5>
+            <p>Draft policies and references</p>
+            <a href="{% url 'blog-home' %}?q=policy" class="btn btn-outline-primary btn-sm">Explore</a>
+        </div>
+        <div class="quick-link-card">
+            <i class="fas fa-user-md"></i>
+            <h5>Ask an Expert</h5>
+            <p>Connect with AMR specialists</p>
+            <a href="{% url 'expert-list' %}" class="btn btn-outline-primary btn-sm">Connect</a>
+        </div>
+        <div class="quick-link-card">
+            <i class="fas fa-map-marked-alt"></i>
+            <h5>By Location</h5>
+            <p>Research by Zambian cities</p>
+            <a href="{% url 'blog-home' %}?q=Lusaka" class="btn btn-outline-primary btn-sm">View</a>
+        </div>
+    </div>
+</div>
+
 {% endblock content %}

@@ -9,157 +9,306 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'blog/main.css' %}">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap" rel="stylesheet">
+    
+    <title>{% block title %}ZedAMR - Research Hub{% endblock %}</title>
 </head>
 <body>
-    <header class="site-header">
-      <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
+    <!-- ============================================================ -->
+    <!-- PROFESSIONAL NAVIGATION BAR - Links on the Right -->
+    <!-- ============================================================ -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm">
         <div class="container">
-    <a class="navbar-brand" href="/">
-    <span class="logo-icon">🔬</span> Research Hub
-</a>
-          <buttwon class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-          </buttwon>
-          <div class="collapse navbar-collapse" id="navbarToggle">
-            <div class="navbar-nav mr-auto">
-                {% if user.is_authenticated %}
-              <a class="nav-item nav-link" href="{% url 'blog-home' %}">HOME</a>
-              <a class="nav-item nav-link" href="{% url 'blog-about' %}">ABOUT</a>
+            <!-- Brand / Logo - Left Side -->
+            <a class="navbar-brand" href="{% url 'blog-home' %}">
+                <span class="brand-icon">🔬</span>
+                <span class="brand-text">ZedAMR</span>
+                <span class="brand-sub">Research Hub</span>
+            </a>
+            
+            <!-- Mobile Toggle -->
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarMain" 
+                    aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <!-- Navbar Content - All Links on the Right -->
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav ml-auto">
+                    <!-- Navigation Links -->
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'blog-home' %}">
+                            <i class="fas fa-home"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'about' in request.path %}active{% endif %}" href="{% url 'blog-about' %}">
+                            <i class="fas fa-info-circle"></i> About
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'expert' in request.path %}active{% endif %}" href="{% url 'expert-list' %}">
+                            <i class="fas fa-user-md"></i> Experts
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'policy' in request.path %}active{% endif %}" href="{% url 'policy-list' %}">
+                            <i class="fas fa-file-pdf"></i> Policies
+                        </a>
+                    </li>
+                    
+                    <!-- Search -->
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-search" href="#" data-toggle="modal" data-target="#searchModal">
+                            <i class="fas fa-search"></i>
+                        </a>
+                    </li>
+                    
+                    <!-- Admin Controls (Only shown when logged in as admin) -->
+                    {% if user.is_authenticated and user.is_staff %}
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-accent" href="{% url 'blog-create' %}">
+                            <i class="fas fa-plus-circle"></i> New Post
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" 
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-user-shield"></i>
+                            <span class="nav-username">Admin</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="adminDropdown">
+                            <a class="dropdown-item" href="{% url 'profile' %}">
+                                <i class="fas fa-user"></i> Profile
+                            </a>
+                            <a class="dropdown-item" href="/admin/">
+                                <i class="fas fa-database"></i> Admin Panel
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <form action="{% url 'logout' %}" method="post" style="display: inline; margin: 0;">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item" style="color: #dc3545;">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                </button>
+                            </form>
+                        </div>
+                    </li>
+                    {% endif %}
+                </ul>
             </div>
-            <!-- Navbar Right Side -->
-            <div class="navbar-nav">
-              <!-- <a class="nav-item nav-link" href="#">Login</a>
-              <a class="nav-item nav-link" href="#">Register</a> -->
-              <!-- <button class="noselect">Create Post</button> -->
-<!--                <h3 style="color: white;">Hello {{request.user}}</h3>-->
-                <a href="{% url 'blog-new' %}" id="auth-links">
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-                Create Post
-            </a>
-                <a href="{% url 'profile' %}" id="auth-links">
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-                Profile
-            </a>
-                <a href="{% url 'logout' %}" id="auth-links">
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-                Logout
-            </a>
-                {% else %}
-              <a href="{% url 'login' %}" id="auth-links">
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-                Login
-            </a>
-            <a href="{% url 'register' %}" id="auth-links">
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-                Register
-            </a>
-            <!-- <a href="#">
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-                Neon button
-            </a> -->
-                {% endif %}
-            </div>
-          </div>
         </div>
-      </nav>
-    </header>
-    <main role="main" class="container">
-      <div class="row">
-          <div class="col-md-8">
-              {%  if messages%}
-                {% for message in messages %}
-                    <div class="alert-{{ message.tags }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-              {% endif %}
-          </div>
-        <div class="col-md-8">
-           {% block content %}{% endblock %}
-        </div>
-        <div class="col-md-4">
-          <div class="content-sectionw">
-            <!-- <h3>Our Sidebar</h3>
-            <p class='text-muted'>You can put any information here you'd like.
-              <ul class="list-group">
-                <li class="list-group-item list-group-item-light">Latest Posts</li>
-                <li class="list-group-item list-group-item-light">Announcements</li>
-                <li class="list-group-item list-group-item-light">Calendars</li>
-                <li class="list-group-item list-group-item-light">etc</li>
-              </ul>
-            </p> -->
-            <div class="d-flex flex-column align-items-stretch flex-shrink-0 bg-white" style="width: 380px;" style="padding-top: 120px;">
-                <a id="list-group" style="text-decoration: none;" href="" class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom">
-                  <!-- <svg class="bi me-2" width="30" height="24"><use xlink:href="#bootstrap"/></svg> -->
-                  <span class="fs-5 fw-semibold" id="gist-btn">Latest Gist</span>
-                </a>
-                <div class="list-group list-group-flush border-bottom scrollarea">
-                  <a href="#" class="list-group-item list-group-item-action  lh-tight" aria-current="true">
-                    <div class="d-flex w-100 align-items-center justify-content-between">
-                      <strong class="mb-1">Seriously, Stop Trying to Teach Toddlers How to Code...By Desphixs
-                    </strong>
-                      <small>Wed</small>
-                    </div>
-                    <div class="col-10 mb-1 small">AS A BABY nerd, I was obsessed with Hackers. The 1995 cult movie... </div>
-                  </a>
-                  <a href="#" class="list-group-item list-group-item-action py-3 lh-tight">
-                    <div class="d-flex w-100 align-items-center justify-content-between">
-                      <strong class="mb-1">Its not a bug - It's a feature... by Desphixs</strong>
-                      <small class="text-muted">Tues</small>
-                    </div>
-                    <div class="col-10 mb-1 small">When it comes to coding, everything works like a miracle, let me use that word...hahaha</div>
-                  </a>
-                  <a href="#" class="list-group-item list-group-item-action py-3 lh-tight">
-                    <div class="d-flex w-100 align-items-center justify-content-between">
-                      <strong class="mb-1">I wanted to be a great programmer but...by Desphixs</strong>
-                      <small class="text-muted">Mon</small>
-                    </div>
-                    <div class="col-10 mb-1 small">in my family trait, nobody knows anything about computers and i wanted to be the greatest computer scientist ever and...</div>
-                  </a>
+    </nav>
 
+    <!-- ============================================================ -->
+    <!-- SEARCH MODAL -->
+    <!-- ============================================================ -->
+    <div class="modal fade" id="searchModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <form method="GET" action="{% url 'blog-home' %}" class="search-modal-form">
+                        <div class="input-group">
+                            <input type="text" name="q" class="form-control form-control-lg" 
+                                   placeholder="Search research papers, topics, authors..." 
+                                   autofocus>
+                            <div class="input-group-append">
+                                <button class="btn btn-primary btn-lg" type="submit">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="button" class="close-modal" data-dismiss="modal">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </form>
                 </div>
-              </div>
-          </div>
+            </div>
         </div>
-      </div>
+    </div>
 
+    <!-- ===== MAIN CONTENT ===== -->
+    <main role="main" class="main-content">
+        <div class="container">
+            <!-- Messages -->
+            {% if messages %}
+                <div class="row">
+                    <div class="col-md-12">
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
 
+            <div class="row">
+                <!-- Main Content -->
+                <div class="col-lg-8">
+                    {% block content %}{% endblock %}
+                </div>
+                
+                <!-- Sidebar -->
+                <div class="col-lg-4">
+                    <aside class="sidebar">
+                        <!-- Sector Quick Links -->
+                        <div class="sidebar-card">
+                            <h5 class="sidebar-card-title">
+                                <i class="fas fa-tags"></i> Sectors
+                            </h5>
+                            <div class="list-group list-group-flush">
+                                {% for sector in sectors %}
+                                <a href="{% url 'sector-posts' sector.slug %}" class="list-group-item list-group-item-action">
+                                    <i class="fas fa-folder"></i> {{ sector.name }}
+                                </a>
+                                {% empty %}
+                                <span class="list-group-item text-muted">No sectors available</span>
+                                {% endfor %}
+                            </div>
+                        </div>
 
-        <footer class="" >
-          <ul class="nav justify-content-center border-bottom"  style="margin-top: 60px;">
-            <li class="nav-item"><a href="#" class="nav-link px-2 text-muted">Home</a></li>
-            <li class="nav-item"><a href="#" class="nav-link px-2 text-muted">Features</a></li>
-            <li class="nav-item"><a href="admin/" class="nav-link px-2 text-muted">Admin</a></li>
-            <li class="nav-item"><a href="#" class="nav-link px-2 text-muted">FAQs</a></li>
-            <li class="nav-item"><a href="#" class="nav-link px-2 text-muted">About</a></li>
-          </ul>
-          <p class="text-center text-muted">&copy; Dr Misheck Shawa 2026</p>
-        </footer>
+                        <!-- Quick Stats -->
+                        <div class="sidebar-card">
+                            <h5 class="sidebar-card-title">
+                                <i class="fas fa-chart-bar"></i> Quick Stats
+                            </h5>
+                            <div class="stats-list">
+                                <div class="stat-item">
+                                    <span class="stat-item-label">Total Posts</span>
+                                    <span class="stat-item-value">{{ total_posts|default:0 }}</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-item-label">Critical Alerts</span>
+                                    <span class="stat-item-value text-danger">{{ total_alerts|default:0 }}</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-item-label">Experts Available</span>
+                                    <span class="stat-item-value text-success">{{ experts.count|default:0 }}</span>
+                                </div>
+                            </div>
+                        </div>
 
+                        <!-- Quick Actions -->
+                        <div class="sidebar-card">
+                            <h5 class="sidebar-card-title">
+                                <i class="fas fa-bolt"></i> Quick Actions
+                            </h5>
+                            <div class="list-group list-group-flush">
+                                <a href="{% url 'blog-home' %}" class="list-group-item list-group-item-action">
+                                    <i class="fas fa-home"></i> Dashboard
+                                </a>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </div>
     </main>
 
+    <!-- ============================================================ -->
+    <!-- PROFESSIONAL FOOTER -->
+    <!-- ============================================================ -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <!-- Column 1: Brand -->
+                <div class="footer-col footer-brand-col">
+                    <div class="footer-brand">
+                        <span class="footer-icon">🔬</span>
+                        <span class="footer-brand-text">ZedAMR</span>
+                        <span class="footer-brand-sub">Research Hub</span>
+                    </div>
+                    <p class="footer-about">
+                        Antimicrobial Resistance Intelligence for Zambia. 
+                        Providing real-time data, research summaries, and 
+                        expert insights to combat drug-resistant infections.
+                    </p>
+                    <div class="footer-social">
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                        <a href="#" aria-label="Email"><i class="fas fa-envelope"></i></a>
+                    </div>
+                </div>
+
+                <!-- Column 2: Quick Links -->
+                <div class="footer-col">
+                    <h5 class="footer-heading">Quick Links</h5>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'blog-home' %}"><i class="fas fa-chevron-right"></i> Home</a></li>
+                        <li><a href="{% url 'blog-about' %}"><i class="fas fa-chevron-right"></i> About</a></li>
+                        <li><a href="{% url 'expert-list' %}"><i class="fas fa-chevron-right"></i> Experts</a></li>
+                        <li><a href="{% url 'policy-list' %}"><i class="fas fa-chevron-right"></i> Policies</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 3: Research Areas -->
+                <div class="footer-col">
+                    <h5 class="footer-heading">Research Areas</h5>
+                    <ul class="footer-links">
+                        {% for sector in sectors %}
+                        <li><a href="{% url 'sector-posts' sector.slug %}"><i class="fas fa-chevron-right"></i> {{ sector.name }}</a></li>
+                        {% empty %}
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Health</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Agriculture</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Environment</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <!-- Column 4: Contact -->
+                <div class="footer-col">
+                    <h5 class="footer-heading">Stay Updated</h5>
+                    <p class="footer-newsletter-text">
+                        Subscribe to receive the latest AMR research and alerts.
+                    </p>
+                    <form class="footer-newsletter" method="POST" action="#">
+                        {% csrf_token %}
+                        <div class="newsletter-group">
+                            <input type="email" class="newsletter-input" placeholder="Enter your email" required>
+                            <button type="submit" class="newsletter-btn">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </form>
+                    <div class="footer-contact">
+                        <p><i class="fas fa-envelope"></i> <a href="mailto:contact@zedamr.org">contact@zedamr.org</a></p>
+                        <p><i class="fas fa-phone"></i> <a href="tel:+260XXX">+260 XXX XXX XXX</a></p>
+                        <p><i class="fas fa-map-marker-alt"></i> Lusaka, Zambia</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Bar -->
+            <div class="footer-bottom">
+                <div class="footer-bottom-content">
+                    <p class="footer-copy">
+                        &copy; {% now "Y" %} <strong>Dr Misheck Shawa</strong> &mdash; 
+                        <i class="fas fa-microscope"></i> ZedAMR Research Hub. 
+                        All rights reserved.
+                    </p>
+                    <ul class="footer-legal">
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Use</a></li>
+                        <li><a href="#">Accessibility</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
     <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>

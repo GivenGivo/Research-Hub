@@ -1,0 +1,12 @@
+{% extends 'blog/base.html' %}
+{% block content %}
+<h2>{{ sector.name }} - Research Posts</h2>
+{% for post in posts %}
+    <article class="media content-section">
+        <h3><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
+        <p>{{ post.summary|truncatechars:150 }}</p>
+    </article>
+{% empty %}
+    <p>No posts in this sector yet.</p>
+{% endfor %}
+{% endblock %}

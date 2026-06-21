@@ -1,21 +1,420 @@
 {% extends 'blog/base.html' %}
 {% load crispy_forms_tags %}
-
+{% load static %}
 
 {% block content %}
-    <div class="content-section">
-        <form action="" method="post">
-            {% csrf_token %}
-            <fieldset class="form-group">
-                <legend class="border-bottom mb-4">Publish Research Summary ⭐</legend>
-                {{ form|crispy }}
-            </fieldset>
-            <div class="form-group">
-                <button class="btn btn-outline-info" type="submit">Post</button>
+<div class="content-section">
+    <form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4">
+                {% if form_action == 'Update' %}
+                <i class="fas fa-edit"></i> Update Research Summary
+                {% else %}
+                <i class="fas fa-plus-circle"></i> Publish Research Summary
+                {% endif %}
+            </legend>
+
+            <!-- Basic Information Section -->
+            <div class="form-section">
+                <h4 class="section-title"><i class="fas fa-info-circle"></i> Basic Information</h4>
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        {{ form.title|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        {{ form.sector|as_crispy_field }}
+                    </div>
+                    <div class="form-group col-md-6">
+                        {{ form.threat_level|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        {{ form.location|as_crispy_field }}
+                    </div>
+                </div>
             </div>
-        </form>
-        <div class="border-top pt-3">
-            <small class="text-muted">Already have an account? <a href="{% url 'blog-home' %}">Go Back</a></small>
+
+            <!-- Content Section -->
+            <div class="form-section">
+                <h4 class="section-title"><i class="fas fa-file-alt"></i> Content</h4>
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        {{ form.summary|as_crispy_field }}
+                        <small class="form-text text-muted">Brief summary shown in cards and previews</small>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        {{ form.content|as_crispy_field }}
+                        <small class="form-text text-muted">Full article with formatting (supports rich text)</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Section -->
+            <div class="form-section stats-section">
+                <h4 class="section-title"><i class="fas fa-chart-bar"></i> Statistics & Data</h4>
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        {{ form.statistic_value|as_crispy_field }}
+                    </div>
+                    <div class="form-group col-md-4">
+                        {{ form.statistic_change|as_crispy_field }}
+                        <small class="form-text text-muted">e.g., ↑ 12% in 6m</small>
+                    </div>
+                    <div class="form-group col-md-4">
+                        {{ form.statistic_label|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        {{ form.cost_estimate|as_crispy_field }}
+                    </div>
+                    <div class="form-group col-md-6">
+                        {{ form.cost_description|as_crispy_field }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Items Section -->
+            <div class="form-section action-section">
+                <h4 class="section-title"><i class="fas fa-tasks"></i> Action Items</h4>
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        {{ form.action_items|as_crispy_field }}
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle"></i> Enter each action item on a new line
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Media & Resources Section -->
+            <div class="form-section media-section">
+                <h4 class="section-title"><i class="fas fa-image"></i> Media & Resources</h4>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        {{ form.featured_image|as_crispy_field }}
+                        <small class="form-text text-muted">Main image for the post</small>
+                    </div>
+                    <div class="form-group col-md-6">
+                        {{ form.infographic|as_crispy_field }}
+                        <small class="form-text text-muted">Infographic for download</small>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        {{ form.pdf_file|as_crispy_field }}
+                        <small class="form-text text-muted">Full research paper PDF</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- References & Tags -->
+            <div class="form-section">
+                <h4 class="section-title"><i class="fas fa-book"></i> References & Metadata</h4>
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        {{ form.references|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        {{ form.tags|as_crispy_field }}
+                        <small class="form-text text-muted">Comma separated tags: e.g., AMR, Zambia, ICU</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Post Settings -->
+            <div class="form-section settings-section">
+                <h4 class="section-title"><i class="fas fa-cog"></i> Post Settings</h4>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <div class="form-check">
+                            {{ form.is_alert|as_crispy_field }}
+                            <label class="form-check-label" for="{{ form.is_alert.id_for_label }}">
+                                <i class="fas fa-exclamation-triangle text-danger"></i> Show as Critical Alert
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <div class="form-check">
+                            {{ form.is_featured|as_crispy_field }}
+                            <label class="form-check-label" for="{{ form.is_featured.id_for_label }}">
+                                <i class="fas fa-star text-warning"></i> Feature on Homepage
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </fieldset>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <button class="btn btn-primary" type="submit">
+                {% if form_action == 'Update' %}
+                <i class="fas fa-save"></i> Update Post
+                {% else %}
+                <i class="fas fa-paper-plane"></i> Publish Post
+                {% endif %}
+            </button>
+            <a class="btn btn-secondary" href="{% url 'blog-home' %}">
+                <i class="fas fa-times"></i> Cancel
+            </a>
         </div>
-    </div>
+    </form>
+</div>
+
+<!-- Custom CSS -->
+<style>
+/* Form Sections */
+.form-section {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s;
+}
+
+.form-section:hover {
+    border-color: #007bff;
+    box-shadow: 0 2px 10px rgba(0, 123, 255, 0.1);
+}
+
+.section-title {
+    color: #2c3e50;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #007bff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-title i {
+    color: #007bff;
+}
+
+/* Statistics Section */
+.stats-section {
+    background: #f0f8ff;
+    border-left: 4px solid #007bff;
+}
+
+/* Action Items Section */
+.action-section {
+    background: #fff5f5;
+    border-left: 4px solid #dc3545;
+}
+
+.action-section .section-title i {
+    color: #dc3545;
+}
+
+.action-section .section-title {
+    border-bottom-color: #dc3545;
+}
+
+/* Media Section */
+.media-section {
+    background: #f0fff4;
+    border-left: 4px solid #28a745;
+}
+
+.media-section .section-title i {
+    color: #28a745;
+}
+
+.media-section .section-title {
+    border-bottom-color: #28a745;
+}
+
+/* Settings Section */
+.settings-section {
+    background: #f8f9fa;
+    border-left: 4px solid #6c757d;
+}
+
+.settings-section .section-title i {
+    color: #6c757d;
+}
+
+.settings-section .section-title {
+    border-bottom-color: #6c757d;
+}
+
+/* Form Check Customization */
+.form-check {
+    padding: 10px;
+    background: white;
+    border-radius: 5px;
+    border: 1px solid #e9ecef;
+    margin-bottom: 10px;
+}
+
+.form-check:hover {
+    background: #f8f9fa;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 2px solid #e9ecef;
+}
+
+.form-actions .btn {
+    padding: 10px 30px;
+    border-radius: 25px;
+    font-weight: 500;
+}
+
+.form-actions .btn-primary {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    border: none;
+}
+
+.form-actions .btn-primary:hover {
+    background: linear-gradient(135deg, #0056b3, #004085);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+}
+
+.form-actions .btn-secondary:hover {
+    transform: translateY(-2px);
+}
+
+/* Help Text Enhancement */
+.help-block {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .form-section {
+        padding: 15px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .form-actions .btn {
+        width: 100%;
+    }
+}
+
+/* File Input Styling */
+input[type="file"] {
+    padding: 10px;
+    background: white;
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+}
+
+input[type="file"]:hover {
+    border-color: #007bff;
+}
+
+/* Textarea Styling */
+textarea {
+    min-height: 100px;
+}
+
+/* Checkbox and Radio Styling */
+input[type="checkbox"], input[type="radio"] {
+    margin-right: 8px;
+}
+
+/* Loading Animation for Submit */
+.btn-primary:disabled {
+    opacity: 0.6;
+}
+
+/* Tooltip for Required Fields */
+.asteriskField {
+    color: #dc3545;
+    margin-left: 4px;
+}
+
+/* Preview Section (Optional) */
+.preview-section {
+    background: white;
+    padding: 15px;
+    border-radius: 5px;
+    border: 2px dashed #dee2e6;
+    margin-top: 20px;
+}
+</style>
+
+<!-- JavaScript for Form Enhancements -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-generate slug from title (if needed)
+    const titleInput = document.querySelector('#id_title');
+    if (titleInput) {
+        titleInput.addEventListener('keyup', function() {
+            // Optional: Auto-fill slug field if it exists
+            const slugInput = document.querySelector('#id_slug');
+            if (slugInput && !slugInput.value) {
+                slugInput.value = this.value
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]+/g, '-')
+                    .replace(/^-+|-+$/g, '');
+            }
+        });
+    }
+
+    // Preview alert toggle
+    const alertCheckbox = document.querySelector('#id_is_alert');
+    if (alertCheckbox) {
+        alertCheckbox.addEventListener('change', function() {
+            const alertPreview = document.querySelector('.alert-preview');
+            if (alertPreview) {
+                if (this.checked) {
+                    alertPreview.style.display = 'block';
+                    alertPreview.style.animation = 'pulse 2s infinite';
+                } else {
+                    alertPreview.style.display = 'none';
+                }
+            }
+        });
+    }
+
+    // File input preview
+    const fileInputs = document.querySelectorAll('input[type="file"]');
+    fileInputs.forEach(input => {
+        input.addEventListener('change', function(e) {
+            const fileName = this.files[0] ? this.files[0].name : 'No file chosen';
+            const label = this.nextElementSibling;
+            if (label && label.classList.contains('file-label')) {
+                label.textContent = fileName;
+            }
+        });
+    });
+});
+
+// Alert Preview Animation Style
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.8; }
+        100% { opacity: 1; }
+    }
+`;
+document.head.appendChild(style);
+</script>
+
 {% endblock content %}
