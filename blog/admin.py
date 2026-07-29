@@ -100,7 +100,11 @@ class PostAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('📄 Basic Information', {
-            'fields': ('title', 'slug', 'summary', 'content', 'author')
+            'fields': ('title', 'slug', 'author')
+        }),
+        ('📝 Content', {
+            'fields': ('summary', 'content'),
+            'description': '📌 <strong>Bottom Line:</strong> Brief summary of the research<br>📌 <strong>More Details:</strong> Full article content'
         }),
         ('🏷️ Classification', {
             'fields': ('sector', 'threat_level', 'location')
@@ -123,6 +127,17 @@ class PostAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
+    
+    # ✅ Add this method to change field labels
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        # Change "Summary" to "Bottom Line"
+        form.base_fields['summary'].label = "Bottom Line"
+        form.base_fields['summary'].help_text = "Brief summary - the key takeaway"
+        # Change "Content" to "More Details"
+        form.base_fields['content'].label = "More Details"
+        form.base_fields['content'].help_text = "Full article with all the details"
+        return form
     
     def title_display(self, obj):
         title = obj.title[:60] + '...' if len(obj.title) > 60 else obj.title
